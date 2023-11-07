@@ -13,6 +13,8 @@ import com.vinicius.springudemy.repositories.UserRepository;
 import com.vinicius.springudemy.services.exceptions.DatabaseException;
 import com.vinicius.springudemy.services.exceptions.ResourceNotFoundException;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @Service
 public class UserService {
     private final UserRepository repository;
@@ -45,14 +47,18 @@ public class UserService {
     }
 
     public User update(Long id, User updatedUser) {
-        User user = repository.getReferenceById(id);
-        if (updatedUser.getName() != null)
-            user.setName(updatedUser.getName());
-        if (updatedUser.getEmail() != null)
-            user.setEmail(updatedUser.getEmail());
-        if (updatedUser.getPhone() != null)
-            user.setPhone(updatedUser.getPhone());
-
-        return repository.save(user);
+        try {
+            User user = repository.getReferenceById(id);
+            if (updatedUser.getName() != null)
+                user.setName(updatedUser.getName());
+            if (updatedUser.getEmail() != null)
+                user.setEmail(updatedUser.getEmail());
+            if (updatedUser.getPhone() != null)
+                user.setPhone(updatedUser.getPhone());
+    
+            return repository.save(user);
+        } catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException(id);
+        }
     }
 }
